@@ -74,7 +74,7 @@ def risk():
     print('function: risk')
     return jsonify(info)
 
-@app.route('/core/contact', methods=['POST'])
+@app.route('/core/contact', methods=['GET'])
 def contact():
     info = {
     "code":0,
