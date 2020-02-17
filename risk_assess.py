@@ -1,18 +1,20 @@
+
 from math import sin, asin, cos, radians, sqrt
 import pandas as pd
 import datetime
 import numpy as np
 
 class risk_model:
-    def __init__(self, lng, lat):
+    def __init__(self, lng, lat, user_time):
         self.distance = [] #距离列表
         self.time = [] #时间列表
-        self.data = self.get_data(lng, lat)
+        self.data = self.get_data(lng, lat, user_time)
 
-    def get_data(self, lng, lat):
+    def get_data(self, lng, lat, user_time):
         data = pd.read_csv('疫情情况数据.csv')
         times = data['date']
         locations = data['geometry']
+        time1 = datetime.datetime.strptime(user_time, "%Y-%m-%d")
         # locations = data['point']  #利用数据的point列判断
         data_list = []
         for i in range(len(locations)):
@@ -20,14 +22,21 @@ class risk_model:
             L = np.array(location)
             L = L.reshape(-1, 2)
             L = L.tolist()
-            for j in range(len(L)):
-                tmp_dict = {}
-                distance = self.geodistance(L[j][0], L[j][1], lng, lat)
-                if distance <= 100.0:
-                    time = str(times.loc[i])
-                    tmp_dict[time] = distance
-                    data_list.append(tmp_dict)
+            time2 = datetime.datetime.strptime(times.loc[i], "%Y-%m-%d")
+            if (time1-time2).days > 3:  #患者超过三天可以不估计
+                continue
+            else:
+                for j in range(len(L)):
+                    tmp_dict = {}
+                    distance = self.geodistance(L[j][0], L[j][1], lng, lat)
+                    if distance <= 100.0:
+                        print(time2, time1)
+                        time = str(times.loc[i])
+                        tmp_dict[time] = distance
+                        data_list.append(tmp_dict)
         return data_list
+
+
 
     def geodistance(self, lng1,lat1,lng2,lat2):
         EARTH_RADIUS = 6371  # 地球平均半径，6371km
@@ -91,5 +100,6 @@ class risk_model:
         return len(self.data)
 
 if __name__ == '__main__':
-    model = risk_model(114.01765272305346, 22.53780423576629)
+    model = risk_model(114.01765272305346, 22.53780423576629, '2020-02-20')
+    # model.risk_cal( 113.47706, 23.149924, '2020-01-07 08:15:00')
     model.risk_pred()

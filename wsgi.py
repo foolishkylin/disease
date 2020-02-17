@@ -54,7 +54,7 @@ def text_match():
     print('function: track')
     return jsonify(info)
 
-@app.route('/core/risk', methods=['GET'])
+@app.route('/core/risk', methods=['POST'])
 def risk():
     json_data = request.get_data()
     info = dict()
@@ -72,6 +72,20 @@ def risk():
     except (json.decoder.JSONDecodeError, TypeError):
         info['code'] = 1
     print('function: risk')
+    return jsonify(info)
+
+@app.route('/core/contact', methods=['POST'])
+def contact():
+    info = {
+    "code":0,
+    "data":[
+        {
+            "user_id": "123",
+        	"time": "2020-2-9 10:22",
+            "lon": "11.11",
+            "lat": "11.11",
+        }
+      ]}
     return jsonify(info)
 
 if __name__ == '__main__':
