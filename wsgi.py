@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import json
 from main import Model
+from risk_assess import risk_model
 import time
 
 app = Flask(__name__)
@@ -18,12 +19,13 @@ def text_match():
     json_data = request.get_data()
     info = dict()
     try:
+        info['code'] = 0
+        info['data'] = list()
         raw_data = json.loads(json_data)
+
         patients = raw_data["patientList"]
         model = Model(raw_data["spaceTimeDataList"])
         model.find_community_label()
-        info['code'] = 0
-        info['data'] = list()
         if len(patients) != 0:
             patient_list = [x["user_id"] for x in patients]
             print("patient_list: ", patient_list)
@@ -43,13 +45,33 @@ def text_match():
                                 break
                         info['data'].append(contact_dict)
 
-    except (json.decoder.JSONDecodeError, TypeError):
+    except (json.decoder.JSONDecodeError, TypeError, KeyError, UnboundLocalError):
         info['code'] = 1
         info['data'] = list()
 
     print(model.community_dict)
     print(model.community_result)
     print('function: track')
+    return jsonify(info)
+
+@app.route('/core/risk', methods=['GET'])
+def risk():
+    json_data = request.get_data()
+    info = dict()
+    info['data'] = False
+    try:
+        info['code'] = 0
+
+        raw_data = json.loads(json_data)
+        if type(raw_data['lon']) == str:
+            raw_data['lon'] = eval(raw_data['lon'])
+            raw_data['lat'] = eval(raw_data['lat'])
+        risk = risk_model(raw_data['lon'], raw_data['lat'])
+        if len(risk.data):
+            info['data'] = True
+    except (json.decoder.JSONDecodeError, TypeError):
+        info['code'] = 1
+    print('function: risk')
     return jsonify(info)
 
 if __name__ == '__main__':
