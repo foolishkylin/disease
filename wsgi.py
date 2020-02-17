@@ -66,7 +66,7 @@ def risk():
         if type(raw_data['lon']) == str:
             raw_data['lon'] = eval(raw_data['lon'])
             raw_data['lat'] = eval(raw_data['lat'])
-        risk = risk_model(raw_data['lon'], raw_data['lat'])
+        risk = risk_model(raw_data['lon'], raw_data['lat'], raw_data['time'].split()[0])
         if len(risk.data):
             info['data'] = True
     except (json.decoder.JSONDecodeError, TypeError):
