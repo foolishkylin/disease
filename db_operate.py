@@ -135,19 +135,19 @@ def db_select():
     for row in data:
         meet_time[row[0]] = eval(row[1])
 
-    sql = "SELECT * FROM PATIENT_LIST"
-    cursor.execute(sql)
-    data = cursor.fetchall()
-    for row in data:
-        patient = dict()
-        patient['user_id'] = row[0]
-        patient['time'] = row[1]
-        patients.append(patient)
+    # sql = "SELECT * FROM PATIENT_LIST"
+    # cursor.execute(sql)
+    # data = cursor.fetchall()
+    # for row in data:
+    #     patient = dict()
+    #     patient['user_id'] = row[0]
+    #     patient['time'] = row[1]
+    #     patients.append(patient)
 
 
     db_close(db, cursor)
 
-    return pair, meet_time, patients
+    return pair, meet_time
 
 
 if __name__ == '__main__':

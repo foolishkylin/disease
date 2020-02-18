@@ -6,7 +6,7 @@ from db_operate import db_select, db_make, db_insert
 class Model:
     def __init__(self):
         self.community_dict = {}  # 记录每个用户的社区类标
-        self.pair, self.meet_time, self.patients = db_select()
+        self.pair, self.meet_time = db_select()
         self.edge_list = []
         for (key, val) in self.pair.items():
             for item in val:
