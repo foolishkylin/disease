@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import json
 from main import Model
+from db_operate import db_insert
 from risk_assess import risk_model
 import time
 
@@ -10,16 +11,20 @@ app.config['JSON_SORT_KEYS'] = False
 CORS(app, resources=r'/*')
 # deal with the cross-domain problem
 
-
-@app.route('/core/contact', methods=['GET'])
+@app.route('/core/contact', methods=['POST'])
 def contact():
+    json_data = request.get_data()
+    raw_data = json.loads(json_data)
+    print(raw_data)
+    patients = raw_data["patientList"]
+    db_insert(patients, 3)
     info = dict()
     model = Model()
     model.find_community_label()
     info['code'] = 0
     info['data'] = list()
-    if len(model.patients) != 0:
-        patient_list = [x["user_id"] for x in model.patients]
+    if len(patients) != 0:
+        patient_list = [x["user_id"] for x in patients]
         print("patient_list: ", patient_list)
         for patient in patient_list:
             search_result = model.search(patient)
@@ -43,6 +48,7 @@ def contact():
     return jsonify(info)
 
 
+
 @app.route('/core/risk', methods=['POST'])
 def risk():
     json_data = request.get_data()
@@ -50,6 +56,7 @@ def risk():
     info['data'] = False
     try:
         info['code'] = 0
+
         raw_data = json.loads(json_data)
         if type(raw_data['lon']) == str:
             raw_data['lon'] = eval(raw_data['lon'])
