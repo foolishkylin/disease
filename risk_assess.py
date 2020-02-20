@@ -23,7 +23,7 @@ class risk_model:
             L = L.reshape(-1, 2)
             L = L.tolist()
             time2 = datetime.datetime.strptime(times.loc[i], "%Y-%m-%d")
-            if (time1-time2).days > 3:  #患者超过三天可以不估计
+            if (time1-time2).days > 10:  #患者超过三天可以不估计
                 continue
             else:
                 for j in range(len(L)):
